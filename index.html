@@ -23,13 +23,36 @@
       <main id="main">
         <section id="projects" aria-labelledby="projects-title">
           <h2 id="projects-title">项目</h2>
-          <!-- 复制 li 添加项目；发布后将名称替换为指向项目地址的 a 标签。 -->
-          <ul class="entries">
-            <li>
-              <span>项目名称 <span class="muted">· 待发布</span></span>
-              <p>一句话介绍项目的用途和使用的技术。</p>
-            </li>
-          </ul>
+          <div class="project-groups">
+            <!-- 在对应分类中复制 li 添加项目；发布后将名称替换为指向项目地址的 a 标签。 -->
+            <div class="project-group" role="group" aria-labelledby="basic-algorithms-title">
+              <h3 id="basic-algorithms-title">基础算法练习</h3>
+              <ul class="entries">
+                <li>
+                  <a href="projects/cartpole-control.html">CartPole Control：动态规划、最优控制与强化学习</a>
+                  <p>用 DP、MPC / iLQR 和 Q-Learning 控制小车倒立摆，比较稳定控制、扰动恢复与训练表现，并实现摆杆连续旋转。</p>
+                </li>
+              </ul>
+            </div>
+            <div class="project-group" role="group" aria-labelledby="advanced-algorithms-title">
+              <h3 id="advanced-algorithms-title">算法的进阶应用</h3>
+              <ul class="entries">
+                <li>
+                  <span>项目名称 <span class="muted">· 待发布</span></span>
+                  <p>一句话介绍算法的应用场景和实现方式。</p>
+                </li>
+              </ul>
+            </div>
+            <div class="project-group" role="group" aria-labelledby="fun-projects-title">
+              <h3 id="fun-projects-title">非正经项目</h3>
+              <ul class="entries">
+                <li>
+                  <span>项目名称 <span class="muted">· 待发布</span></span>
+                  <p>一句话介绍这个项目的脑洞和有趣之处。</p>
+                </li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         <section id="blog" aria-labelledby="blog-title">

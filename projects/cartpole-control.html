@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="description" content="在 CartPole 仿真中实践动态规划、MPC / iLQR 与 Q-Learning，记录稳定控制、训练调优、扰动恢复和连续旋转的实验结果。">
+    <title>CartPole Control · 宁树丶</title>
+    <link rel="stylesheet" href="../styles.css">
+    <style>
+      .project-header { padding-block: 32px; }
+      .project-header h1 { margin-block: 10px 16px; }
+      .project-meta, .project-note { color: var(--muted); font-size: 13px; }
+      .project-content section { display: block; }
+      .project-content h2 { margin-bottom: 18px; font-size: 18px; }
+      .project-content h3 { margin: 24px 0 8px; font-size: 15px; font-weight: 600; }
+      .project-content p + p { margin-top: 12px; }
+      .project-content ul { margin: 0; padding-left: 20px; }
+      .project-content li + li { margin-top: 12px; }
+      .results-table { overflow-x: auto; margin-bottom: 14px; }
+      table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+      caption { text-align: left; margin-bottom: 12px; color: var(--muted); }
+      th, td { padding: 10px 12px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+      th:first-child, td:first-child { text-align: left; }
+      .demo-placeholder { display: grid; place-content: center; gap: 8px; min-height: 220px; margin: 0; padding: 24px; border: 1px dashed var(--line); background: #fafafa; text-align: center; }
+      .demo-placeholder p { color: var(--muted); font-size: 13px; }
+      .project-content video { display: block; width: 100%; }
+      .project-resources { margin-top: 20px; }
+      .project-resources p { margin-top: 8px; }
+    </style>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+    <div class="page">
+      <header class="site-header">
+        <a href="../index.html">宁树丶</a>
+        <nav aria-label="项目导航">
+          <a href="../index.html#basic-algorithms-title">返回基础算法练习</a>
+          <a href="#demo">Demo 与源码</a>
+        </nav>
+      </header>
+
+      <main id="main" class="project-content">
+        <article aria-labelledby="project-title">
+          <header class="project-header">
+            <p class="project-meta">基础算法练习 · Python · 仿真控制</p>
+            <h1 id="project-title">CartPole Control：动态规划、最优控制与强化学习</h1>
+            <p>欠驱动系统，移动小车以保持摆杆直立。在课程提供的 Python 仿真与算法框架上，实践 DP、MPC / iLQR 和 (Tabular) Q-Learning，研究算法选择与参数调整如何影响控制表现。</p>
+            <!-- <p class="project-meta">University of Edinburgh · Robot and Reinforcement Learning · Coursework 1 · 2026</p> -->
+          </header>
+
+          <section aria-labelledby="algorithms-title">
+            <h2 id="algorithms-title">所用算法</h2>
+            <ul>
+              <li><strong>动态规划（DP & Value Iteration）：</strong>将小车位置、速度、摆杆角度和角速度离散化，利用已知动力学离线求出控制策略；比较折扣因子和代价权重，并分析可恢复区域。</li>
+              <li><strong>最优控制（MPC / iLQR）：</strong>用 iLQR 优化连续控制序列，在 MPC 中根据当前状态反复规划；测试预测时域对稳定性的影响，并与预计算轨迹加状态反馈的闭环 iLQR 比较扰动恢复能力。</li>
+              <li><strong>Tabular Q-Learning：</strong>通过仿真交互学习左右施力的策略；比较固定学习率、学习率衰减和探索率衰减，改善训练后期的波动。</li>
+            </ul>
+          </section>
+
+          <section aria-labelledby="results-title">
+            <h2 id="results-title">实验结论</h2>
+            <!-- <div class="results-table" role="region" aria-label="回合代价统计，可横向滚动" tabindex="0">
+              <table>
+                <caption>摆杆角度边界 ±25°；DP / Q-Learning 每维状态离散分辨率为 40。以下数值来自项目材料中的报告统计。</caption>
+                <thead>
+                  <tr><th scope="col">方法</th><th scope="col">平均代价</th><th scope="col">标准差</th><th scope="col">最小值</th><th scope="col">最大值</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th scope="row">DP</th><td>0.0161</td><td>0.0123</td><td>0.0011</td><td>0.0795</td></tr>
+                  <tr><th scope="row">MPC</th><td>0.0059</td><td>0.0060</td><td>0.0003</td><td>0.0162</td></tr>
+                  <tr><th scope="row">Q-Learning</th><td>0.0022</td><td>0.0013</td><td>0.0007</td><td>0.0099</td></tr>
+                </tbody>
+              </table>
+            </div> -->
+            <!-- <p class="project-note">三种方法均能使小车稳定控制摆杆。</p> -->
+
+            <h3>参数与训练</h3>
+            <ul>
+              <li><strong>DP：</strong>较大的折扣因子使远期失败风险更明显；本实验中，位置和角度代价权重均取 0.01 比均取 0.1 更平衡。在零速度的价值函数切片中，约 ±8° 是较易恢复的角度范围。</li>
+              <li><strong>MPC：</strong>测试 Horizon h = 1–100，最短 h = 8 可避免回合提前终止，h = 30–40 可使平均代价低于 0.01。更长的horizon改善了前瞻性，也增加了在线优化规模。</li>
+              <li><strong>Q-Learning：</strong>固定学习率候选中，0.05 整体较好；将学习率设置为从 0.1 线性衰减至最低 0.00001 时，约 850 万训练时间步达到收敛。单独降低探索率能缓和部分波动，但训练后期仍会出现性能下降。</li>
+            </ul>
+
+            <h3>扰动恢复与模型变化</h3>
+            <p>
+                每 20 步施加随机外力时，所测试的闭环 iLQR 比 MPC 承受了更高的扰动阈值。
+                推测这是因为 iLQR 并非简单地开环执行预计算控制序列，
+                而是通过状态反馈项 Kₜ(xₜ − x̄ₜ) 实时修正控制输入，
+                使系统能够在受到扰动后向名义轨迹恢复。
+                因此，该结果仅反映本实验配置下两种控制器的表现，
+                不能直接得出 iLQR 的鲁棒性普遍优于 MPC 的结论。
+            </p>
+            <p>将评估环境的摆杆长度从标称 0.5 调至 5，原有 DP 策略仍表现出一定容错能力，但平均累计代价随长度增加而上升，说明模型误差会带来性能退化。</p>
+
+            <h3>从直立稳定到连续旋转</h3>
+            <p>沿用 MPC，将目标改为角速度 8，并调整小车位置、速度与摆杆角速度的代价权重，实现了摆杆持续高速旋转，同时抑制小车漂移。实际角速度围绕目标值周期性波动，并非严格恒定。</p>
+          </section>
+
+          <section id="demo" aria-labelledby="demo-title">
+            <h2 id="demo-title">Demo 与源码</h2>
+            <video controls preload="metadata" playsinline poster="demo/demo1-poster.jpg" aria-label="CartPole 稳定控制与连续旋转演示">
+              <source src="./demo/demo1.mp4" type="video/mp4">
+              你的浏览器不支持视频播放。
+            </video>
+            <!-- <p class="project-note">若 IDE 预览无法播放，请在浏览器中打开本页面，或<a href="demo/demo1.mp4">直接打开 Demo 视频</a>。</p> -->
+            <!-- <div class="demo-placeholder">
+              <strong>Demo 视频 · 待补充</strong>
+              <p>稳定控制 / 扰动恢复 / 连续旋转</p>
+            </div> -->
+            <div class="project-resources">
+              <p><a href="https://github.com/NingShuZhu/RRL_cw1">GitHub · 查看项目源码 ↗</a></p>
+              <!-- <p>GitHub <span class="muted">· 项目仓库链接待补充</span></p> -->
+            </div>
+          </section>
+
+          <section aria-labelledby="conclusions-title">
+            <h2 id="conclusions-title">结论</h2>
+            <p>DP 将计算集中在离线策略求解，但受状态离散规模限制；MPC 能根据当前状态持续规划，预测时域和反馈配置直接影响表现；Q-Learning 可以通过交互获得有效策略，学习率调度对最终训练稳定性尤其关键。</p>
+            <p>连续旋转实验说明，调整控制目标和代价权重，就能复用同一优化框架生成不同运动。项目的主要收获是将控制任务转化为可求解、可训练和可评估的问题，并通过实验理解参数选择带来的取舍。</p>
+            <p class="project-note">实验基于仿真环境与课程给定的框架。</p>
+          </section>
+        </article>
+      </main>
+    </div>
+  </body>
+</html>
