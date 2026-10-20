@@ -1,19 +1,12 @@
-# Personal GitHub Pages
+﻿# 个人主页
 
-A responsive, bilingual personal homepage built with plain HTML, CSS, and JavaScript. There is no build step or package installation.
+简约的 GitHub Pages 主页，只展示项目、技术博客和联系方式。使用纯 HTML 和 CSS，无需安装依赖或构建。
 
-## Personalize
+## 更新内容
 
-Edit `index.html` to replace the name, introduction, project descriptions, notes, and email address. The sample text is placeholder content. Update the GitHub profile link if your account URL differs. Adjust the palette and layout in `styles.css` as needed.
+编辑 `index.html`：
 
-## Preview
+- 项目和技术博客：各保留一个标为「待发布」的模板条目。复制对应列表中的 `li`，填写名称和一句话说明；发布后将名称的外层 `span` 替换为 `<a href="实际地址">名称</a>`，并移除「待发布」。
 
-Open `index.html` in a browser, or serve this directory with any static file server.
+在 `styles.css` 中调整排版和颜色。页面无需 JavaScript，支持手机屏幕和键盘导航。
 
-## Publish
-
-1. Push the repository to GitHub's `main` branch.
-2. In the repository, open **Settings → Pages** and set the build and deployment source to **GitHub Actions**.
-3. The workflow in `.github/workflows/pages.yml` deploys the site on each push to `main`. You can also start it from the **Actions** tab with **Run workflow**.
-
-For a user site, the repository name should be `<your-github-username>.github.io`. Once the workflow completes, GitHub Pages will show the published URL in the deployment environment and Pages settings.
